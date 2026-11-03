@@ -1,0 +1,36 @@
+{
+  "generatedAt": "2026-11-02T22:31:48",
+  "tenantId": "ac1c9a59-3e53-4771-a9c3-bfe388f15572",
+  "workspaceName": "FGD-Security-Demo",
+  "workspaceId": "4f6db56f-d598-477f-b761-96e9db49131c",
+  "capacityId": "3964572d-52dc-4459-b00e-6bf267cff294",
+  "items": {
+    "sqldb_core_banking": "c35c8908-5bf3-442e-af03-f62e2e129cbe",
+    "lh_bronze": "deba2396-2d88-4441-a32f-462311778f98",
+    "lh_silver": "13c08b78-ea82-4ebc-8531-0b46132326b4",
+    "wh_gold": "e71718e3-dbc7-4069-93d7-e7b9d442017b",
+    "nb_01_ingest_files": "f495ccb2-e6fe-40e7-9244-2c0e2971ccff",
+    "nb_02_bronze_to_silver": "e0efa780-f377-4e34-ab6b-5048a161d5f0",
+    "nb_03_check_my_access": "adbeb9fb-dbf0-4aed-b643-62ed4d1dbd14",
+    "pl_daily_load": "402a93fc-8ec6-4ba2-9231-48341a48a33f",
+    "sm_gold_banking": "44e1ac44-78c0-4790-b80b-4b54ac912bab"
+  },
+  "sqlDatabase": {
+    "serverFqdn": "lgnbzlcthzyupkodx7ryr4kvoi-n62w2t4y2v7upn3bs3u5wsitdq.database.fabric.microsoft.com,1433",
+    "databaseName": "sqldb_core_banking-c35c8908-5bf3-442e-af03-f62e2e129cbe"
+  },
+  "lhSilverSqlEndpoint": {
+    "id": "1acb8800-ad47-4c6f-bdad-6bc438927386",
+    "connectionString": "lgnbzlcthzyupkodx7ryr4kvoi-n62w2t4y2v7upn3bs3u5wsitdq.datawarehouse.fabric.microsoft.com"
+  },
+  "whGold": {
+    "connectionString": "lgnbzlcthzyupkodx7ryr4kvoi-n62w2t4y2v7upn3bs3u5wsitdq.datawarehouse.fabric.microsoft.com",
+    "database": "wh_gold"
+  },
+  "sandbox": {
+    "workspaceName": "FGD-Analyst-Sandbox",
+    "workspaceId": "03436d22-da7f-447c-91b1-46db23cac8b1",
+    "nb_03_check_my_access": "c2fa6f26-2b6b-411f-a9d8-29288463452d"
+  },
+  "failedSteps": []
+}

@@ -4,9 +4,9 @@
     03-Grant-FgdDemoAccess.ps1   (OPTIONAL - "pre-staged" path for Demo 3)
 
     1. Pre-creates OneLake security (data access) roles on lh_silver:
-         reader_on   -> sg-<prefix>-province-on   Read on the 4 silver tables
-         reader_qc   -> sg-<prefix>-province-qc   Read on the 4 silver tables
-         steward_all -> sg-<prefix>-stewards      Read on the 4 silver tables
+         ReaderOn   -> sg-<prefix>-province-on   Read on the 4 silver tables
+         ReaderQc   -> sg-<prefix>-province-qc   Read on the 4 silver tables
+         StewardAll -> sg-<prefix>-stewards      Read on the 4 silver tables
        Table-level only by default. Row (province) and column (hide sin, date_of_birth)
        rules are added LIVE in the UI during Demo 3. Use -IncludeRowColumnRules to
        pre-create them too (rehearsal / fallback).
@@ -146,11 +146,11 @@ function New-DemoRole([string]$Name, [string]$GroupName, [string]$Province) {
     }
 }
 
-# NOTE: if the service rejects underscores in role names, rename to readerON / readerQC / stewardAll here and on the slide.
+# OneLake security role names: letters and digits only, starting with a letter (no underscores).
 $demoRoles = @(
-    New-DemoRole 'reader_on'   "sg-$Prefix-province-on" 'ON'
-    New-DemoRole 'reader_qc'   "sg-$Prefix-province-qc" 'QC'
-    New-DemoRole 'steward_all' "sg-$Prefix-stewards"    $null
+    New-DemoRole 'ReaderOn'   "sg-$Prefix-province-on" 'ON'
+    New-DemoRole 'ReaderQc'   "sg-$Prefix-province-qc" 'QC'
+    New-DemoRole 'StewardAll' "sg-$Prefix-stewards"    $null
 )
 $demoNames = $demoRoles | ForEach-Object { $_.name }
 

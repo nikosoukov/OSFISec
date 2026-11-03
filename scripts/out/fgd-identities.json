@@ -1,0 +1,48 @@
+{
+  "generatedAt": "2026-11-02T21:35:07",
+  "tenantId": "ac1c9a59-3e53-4771-a9c3-bfe388f15572",
+  "tenantDomain": "MngEnvMCAP530541.onmicrosoft.com",
+  "prefix": "fgd",
+  "presenter": {
+    "upn": "admin@MngEnvMCAP530541.onmicrosoft.com",
+    "id": "d957cc65-c2bf-45ca-a274-6074dbb7999d"
+  },
+  "users": {
+    "dana": {
+      "upn": "fgd.dana.engineer@MngEnvMCAP530541.onmicrosoft.com",
+      "id": "51b93c86-c3d5-41c3-92e4-f03e83fbd8e0"
+    },
+    "olivia": {
+      "upn": "fgd.olivia.analyst@MngEnvMCAP530541.onmicrosoft.com",
+      "id": "7fc8ef2d-fb46-496e-8578-fb262a7267fc"
+    },
+    "quentin": {
+      "upn": "fgd.quentin.analyst@MngEnvMCAP530541.onmicrosoft.com",
+      "id": "d1fae5b6-429e-4a8d-8451-5fbecc501d4e"
+    },
+    "sam": {
+      "upn": "fgd.sam.steward@MngEnvMCAP530541.onmicrosoft.com",
+      "id": "12a71107-bfc6-4641-9718-c3a89b9b66c8"
+    },
+    "aaron": {
+      "upn": "fgd.aaron.auditor@MngEnvMCAP530541.onmicrosoft.com",
+      "id": "f42926f8-c15b-4e40-8875-815379fd2d7e"
+    }
+  },
+  "groups": {
+    "sg-fgd-admins": "7515c963-967e-4af3-96c5-8b323859a16b",
+    "sg-fgd-engineers": "8550d005-3c35-4e92-9ffe-08a8955577fb",
+    "sg-fgd-analysts": "3703d641-a40b-4650-ba18-e36ef4591162",
+    "sg-fgd-province-on": "410e0866-f055-4d46-aae9-d2eea3f763fa",
+    "sg-fgd-province-qc": "70537f35-f794-4eec-b29b-582ab4151590",
+    "sg-fgd-stewards": "be1d9132-984f-48c2-b7a7-8ad566196eba",
+    "sg-fgd-auditors": "62b186b3-83fc-4d95-932e-02a8b6664d13",
+    "sg-fgd-automation": "ff5e1b1b-03f9-488a-ae58-0ebc561e193f"
+  },
+  "servicePrincipal": {
+    "displayName": "sp-fgd-automation",
+    "appId": "1fe3a8cd-8a77-49a4-ae9a-95c9592b0577",
+    "applicationObjectId": "52d58591-f9d0-4e7b-8196-ab9715e4283a",
+    "servicePrincipalId": "1e8d0c64-11c0-4cae-9049-e6a0f42867c9"
+  }
+}

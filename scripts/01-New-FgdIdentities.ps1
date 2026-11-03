@@ -17,7 +17,7 @@
       ./out/fgd-identities.json   object ids (consumed by 02/03 scripts)
       ./out/fgd-credentials.csv   initial passwords of NEW users  >>> DELETE AFTER REHEARSAL <<<
 
-    Requires: PowerShell 7, Microsoft.Graph.Authentication / .Users / .Groups /
+    Requires: Windows PowerShell 5.1 or PowerShell 7, Microsoft.Graph.Authentication / .Users / .Groups /
               .Identity.DirectoryManagement (+ .Applications with -CreateServicePrincipal)
               Entra roles: User Administrator + Groups Administrator (+ Application
               Administrator for -CreateServicePrincipal), or Global Administrator.
@@ -106,16 +106,28 @@ if (-not $TenantId) { $TenantId = $ctx.TenantId }
 Write-Ok "signed in as $($ctx.Account) to tenant $($ctx.TenantId)"
 
 # ------------------------------------------------------------------ helpers
+$script:Rng = [System.Security.Cryptography.RandomNumberGenerator]::Create()
+function Get-RandomIndex([int]$Max) {
+    # Unbiased cryptographic integer in [0, Max). Works in Windows PowerShell 5.1 and PowerShell 7.
+    $bytes = New-Object byte[] 4
+    $limit = [uint32]::MaxValue - ([uint32]::MaxValue % [uint32]$Max)
+    do {
+        $script:Rng.GetBytes($bytes)
+        $value = [System.BitConverter]::ToUInt32($bytes, 0)
+    } while ($value -ge $limit)
+    return [int]($value % [uint32]$Max)
+}
+
 function New-StrongPassword([int]$Length = 20) {
     # Cryptographically random; guarantees upper, lower, digit and symbol.
     $sets = @('ABCDEFGHJKLMNPQRSTUVWXYZ', 'abcdefghijkmnopqrstuvwxyz', '23456789', '!@#%^*-_=+?')
     $all = -join $sets
-    $chars = [System.Collections.Generic.List[char]]::new()
-    foreach ($s in $sets) { $chars.Add($s[[System.Security.Cryptography.RandomNumberGenerator]::GetInt32($s.Length)]) }
-    while ($chars.Count -lt $Length) { $chars.Add($all[[System.Security.Cryptography.RandomNumberGenerator]::GetInt32($all.Length)]) }
+    $chars = New-Object 'System.Collections.Generic.List[char]'
+    foreach ($s in $sets) { $chars.Add($s[(Get-RandomIndex $s.Length)]) }
+    while ($chars.Count -lt $Length) { $chars.Add($all[(Get-RandomIndex $all.Length)]) }
     # Fisher-Yates shuffle
     for ($i = $chars.Count - 1; $i -gt 0; $i--) {
-        $j = [System.Security.Cryptography.RandomNumberGenerator]::GetInt32($i + 1)
+        $j = Get-RandomIndex ($i + 1)
         $tmp = $chars[$i]; $chars[$i] = $chars[$j]; $chars[$j] = $tmp
     }
     return -join $chars

@@ -1,4 +1,5 @@
-﻿<#
+﻿#Requires -Version 7.2
+<#
     SYNTHETIC DATA · for training only · no real customer data
     ------------------------------------------------------------------
     02-Deploy-FgdWorkspace.ps1
@@ -92,14 +93,33 @@ if (-not $azCtx -or ($TenantId -and $azCtx.Tenant.Id -ne $TenantId)) {
     $connect = @{ ErrorAction = 'Stop' }
     if ($TenantId) { $connect.Tenant = $TenantId }
     if ($UseDeviceAuthentication) { $connect.UseDeviceAuthentication = $true }
+    $connect.AuthScope = 'https://api.fabric.microsoft.com'
     Connect-AzAccount @connect | Out-Null
     $azCtx = Get-AzContext
 }
 Write-Ok "signed in as $($azCtx.Account.Id)"
 
+$script:TokenCache = @{}
 function Get-Token([string]$ResourceUrl) {
     # Newer Az.Accounts returns Token as SecureString; older returns a string.
-    $t = Get-AzAccessToken -ResourceUrl $ResourceUrl -ErrorAction Stop -WarningAction SilentlyContinue
+    # When Conditional Access (MFA) requires interaction for a resource, sign in again
+    # with -AuthScope for that resource (one browser prompt per resource), then retry.
+    $t = $null
+    try {
+        $t = Get-AzAccessToken -ResourceUrl $ResourceUrl -ErrorAction Stop -WarningAction SilentlyContinue
+    }
+    catch {
+        $msg = $_.Exception.Message
+        if ($msg -notmatch 'interaction|AuthScope|multi-factor|MFA|AADSTS50076|AADSTS50079|AADSTS53003|claims') { throw }
+        if ($script:TokenCache[$ResourceUrl]) { throw }   # already re-authenticated once for this resource
+        Write-Info "Conditional Access needs an interactive sign-in for $ResourceUrl - opening sign-in..."
+        $re = @{ AuthScope = $ResourceUrl; ErrorAction = 'Stop' }
+        if ($TenantId) { $re.Tenant = $TenantId }
+        if ($UseDeviceAuthentication) { $re.UseDeviceAuthentication = $true }
+        Connect-AzAccount @re -WarningAction SilentlyContinue | Out-Null
+        $script:TokenCache[$ResourceUrl] = $true
+        $t = Get-AzAccessToken -ResourceUrl $ResourceUrl -ErrorAction Stop -WarningAction SilentlyContinue
+    }
     if ($t.Token -is [System.Security.SecureString]) {
         return [System.Net.NetworkCredential]::new('', $t.Token).Password
     }
@@ -491,6 +511,22 @@ if (-not $SkipPipelineRun) {
             Start-Sleep -Seconds 30
         }
         Start-Sleep -Seconds 30    # let the first replication cycle finish writing
+    } | Out-Null
+
+    Invoke-Step 'OneLake shortcuts lh_bronze/Tables/customers, accounts -> sqldb_core_banking' 'README > Setup > S8: lh_bronze > Tables > ... > New shortcut > Microsoft OneLake > sqldb_core_banking > Tables/dbo > tick customers, accounts > Create.' {
+        # Created here with the presenter's token: a notebook's token lacks the scope the
+        # shortcuts API needs (HTTP 403 InsufficientScopes), so nb_01 only checks they exist.
+        foreach ($t in 'customers', 'accounts') {
+            $r = Invoke-Fabric -Path "/v1/workspaces/$wsId/items/$($S.lhBronze.id)/shortcuts/Tables/$t" -Raw
+            if ([int]$r.StatusCode -eq 200) { Write-Info "shortcut lh_bronze/Tables/$t exists"; continue }
+            $body = @{
+                path   = 'Tables'
+                name   = $t
+                target = @{ oneLake = @{ workspaceId = $wsId; itemId = $S.sqlDb.id; path = "Tables/dbo/$t" } }
+            }
+            Invoke-Fabric -Method POST -Path "/v1/workspaces/$wsId/items/$($S.lhBronze.id)/shortcuts" -Body $body | Out-Null
+            Write-Ok "created shortcut lh_bronze/Tables/$t -> sqldb_core_banking/Tables/dbo/$t"
+        }
     } | Out-Null
 
     Invoke-Step "Run pl_daily_load (max $PipelineTimeoutMinutes min)" 'README > Setup > S8: open pl_daily_load > Run; or run nb_01 then nb_02 manually.' {

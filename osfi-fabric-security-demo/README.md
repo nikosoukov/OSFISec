@@ -44,9 +44,9 @@
 |---|---|---|---|---|---|---|---|
 | Presenter | **FGD Presenter** | sg-fgd-admins | Admin | bypasses roles | db_owner | Write (RLS doesn't apply) | Everything |
 | fgd.dana.engineer | **FGD Dana** | sg-fgd-engineers | Contributor | **bypasses roles (lead finding)** | db_owner | Write (RLS doesn't apply) | Everything |
-| fgd.olivia.analyst | **FGD Olivia** | sg-fgd-analysts, sg-fgd-province-on | Viewer | reader_on: ON rows, no sin/DOB | ON rows, masked email, SIN denied | Province role: ON, no SIN/DOB | Ontario only |
-| fgd.quentin.analyst | **FGD Quentin** | sg-fgd-analysts, sg-fgd-province-qc | Viewer | reader_qc: QC rows | QC rows, masked, SIN denied | Province role: QC | Quebec only |
-| fgd.sam.steward | **FGD Sam** | sg-fgd-stewards | Viewer | steward_all: all | all rows, unmasked, SIN visible | Steward role: all | Everything, read-only |
+| fgd.olivia.analyst | **FGD Olivia** | sg-fgd-analysts, sg-fgd-province-on | Viewer | ReaderOn: ON rows, no sin/DOB | ON rows, masked email, SIN denied | Province role: ON, no SIN/DOB | Ontario only |
+| fgd.quentin.analyst | **FGD Quentin** | sg-fgd-analysts, sg-fgd-province-qc | Viewer | ReaderQc: QC rows | QC rows, masked, SIN denied | Province role: QC | Quebec only |
+| fgd.sam.steward | **FGD Sam** | sg-fgd-stewards | Viewer | StewardAll: all | all rows, unmasked, SIN visible | Steward role: all | Everything, read-only |
 | fgd.aaron.auditor | **FGD Aaron** | sg-fgd-auditors | Viewer | no role, no data | denied on gold and sec | no role, no data | Metadata, lineage, audit only |
 
 Other groups: `sg-fgd-automation` (holds the optional service principal `sp-fgd-automation`; used to scope the "service principals can use Fabric APIs" tenant setting).
@@ -178,9 +178,9 @@ Run order: D1 → D8. Spark sessions take 1–3 min to start on small capacities
 ### D3 · OneLake security on lh_silver (4 min). Profiles: **Presenter**, then **Olivia**, then **Dana**
 *Live mode (default):*
 1. Open **lh_silver** > **Manage OneLake security** > **Enable** (read the warning: enabling may not be reversible). *Expected:* role **DefaultReader** appears.
-2. **New role** `reader_on` > permission **Read** > select tables customer, account, loan, transaction_monthly > **Assign** members: **sg-fgd-province-on** > Save.
-3. In `reader_on`, on table **customer**: **Row security** `SELECT * FROM customer WHERE province = 'ON'`. **Column security**: remove **sin** and **date_of_birth**. Save. *(RLS and CLS in the SAME role.)* Optionally add the same row rule to account / loan / transaction_monthly.
-4. Show the pre-created `reader_qc` (QC) and `steward_all` (all tables, no rules), or create them quickly.
+2. **New role** `ReaderOn` > permission **Read** > select tables customer, account, loan, transaction_monthly > **Assign** members: **sg-fgd-province-on** > Save.
+3. In `ReaderOn`, on table **customer**: **Row security** `SELECT * FROM customer WHERE province = 'ON'`. **Column security**: remove **sin** and **date_of_birth**. Save. *(RLS and CLS in the SAME role.)* Optionally add the same row rule to account / loan / transaction_monthly.
+4. Show the pre-created `ReaderQc` (QC) and `StewardAll` (all tables, no rules), or create them quickly.
 5. **Delete DefaultReader** (it grants broad read to anyone with ReadAll). Access now comes only from explicit roles.
 6. lh_silver > **SQL analytics endpoint** > Settings/Security > OneLake security mode = **User identity** (not Delegated).
 7. **FGD Olivia**: lh_silver SQL analytics endpoint > New SQL query:
@@ -244,7 +244,7 @@ Save them in `shots/` (any image viewer). If a live step fails, say "here's what
 |---|---|
 | D1 | Manage access (groups only) · Tenant setting "Service principals can use Fabric APIs" scoped to sg-fgd-automation · Copilot/data agent setting scoped |
 | D2 | Monitor replication (3 tables Running) · lh_bronze tree with shortcut icons + CSVs · shortcut properties · pl_daily_load successful run · notebook activity settings |
-| D3 | Manage OneLake security with roles · reader_on row rule + column rule · DefaultReader deleted · Olivia SQL result (ON only, no sin) · Dana SQL result (13 provinces, sin) |
+| D3 | Manage OneLake security with roles · ReaderOn row rule + column rule · DefaultReader deleted · Olivia SQL result (ON only, no sin) · Dana SQL result (13 provinces, sin) |
 | D4 | nb_03 output as Dana · nb_03 output as Olivia (filtered or ACCESS DENIED) · Key Vault cell |
 | D5 | Each BLOCK 5 result as Olivia (ON, masked, denied, denied) · Sam (all, unmasked, SIN) · BLOCK 6 inventory |
 | D6 | Province role DAX + OLS · Test as role (Olivia) report · report as Olivia/Quentin |
@@ -257,7 +257,7 @@ Save them in `shots/` (any image viewer). If a live step fails, say "here's what
 
 **Reset for a clean live run**
 1. **wh_gold**: run `sql/39_wh_gold_reset.sql` as the presenter (removes policy, function, mask, denies). All three verification result sets should be empty.
-2. **lh_silver OneLake security**: if you rehearsed **Live mode**, OneLake security stays enabled. Either switch to **Pre-staged mode** for the session, or fully reset: delete **lh_silver**, wait ~5 min, rerun `02-Deploy-FgdWorkspace.ps1` (recreates lh_silver and reruns pl_daily_load and sql/30), then redo S12 if the report breaks. Faster alternative: just delete the RLS/CLS rules from reader_on and redo only step 3 live.
+2. **lh_silver OneLake security**: if you rehearsed **Live mode**, OneLake security stays enabled. Either switch to **Pre-staged mode** for the session, or fully reset: delete **lh_silver**, wait ~5 min, rerun `02-Deploy-FgdWorkspace.ps1` (recreates lh_silver and reruns pl_daily_load and sql/30), then redo S12 if the report breaks. Faster alternative: just delete the RLS/CLS rules from ReaderOn and redo only step 3 live.
 3. **Labels**: remove the label from lh_silver / wh_gold / downstream items (you may be asked for a downgrade justification).
 4. **Data agent**: start a new chat in each persona profile.
 5. Spark: stop running sessions (Monitor hub) to free the capacity.
