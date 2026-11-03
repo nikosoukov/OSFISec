@@ -1,0 +1,5 @@
+/// SYNTHETIC DATA · for training only · no real customer data
+/// Stewards (sg-fgd-stewards) see every province and every column.
+/// Needed because once a model has roles, Viewers who are in NO role see no data.
+role Steward
+	modelPermission: read

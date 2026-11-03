@@ -1,0 +1,13 @@
+/// SYNTHETIC DATA · for training only · no real customer data
+/// Dynamic RLS: the caller sees only the province mapped to their UPN in sec_user_province ('*' = all).
+/// Filter flows dim_customer -> dim_account -> fact_transaction_monthly and dim_customer -> fact_loan.
+/// OLS: sin and date_of_birth do not exist for members of this role.
+/// Members (Entra group sg-fgd-analysts) are added in the service: model > Security. See README.
+role Province
+	modelPermission: read
+
+	tablePermission dim_customer = VAR _p = LOOKUPVALUE(sec_user_province[province], sec_user_province[upn], LOWER(USERPRINCIPALNAME())) RETURN _p = "*" || dim_customer[province] = _p
+
+		columnPermission sin = none
+
+		columnPermission date_of_birth = none

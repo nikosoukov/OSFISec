@@ -1,0 +1,11 @@
+relationship rel_account_customer
+	fromColumn: dim_account.customer_id
+	toColumn: dim_customer.customer_id
+
+relationship rel_loan_customer
+	fromColumn: fact_loan.customer_id
+	toColumn: dim_customer.customer_id
+
+relationship rel_txn_account
+	fromColumn: fact_transaction_monthly.account_id
+	toColumn: dim_account.account_id

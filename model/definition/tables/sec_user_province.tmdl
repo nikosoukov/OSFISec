@@ -1,0 +1,23 @@
+/// SYNTHETIC DATA · for training only · no real customer data
+/// Security mapping used by the Province role (dynamic RLS). Hidden from report authors.
+table sec_user_province
+	isHidden
+
+	column upn
+		dataType: string
+		isHidden
+		summarizeBy: none
+		sourceColumn: upn
+
+	column province
+		dataType: string
+		isHidden
+		summarizeBy: none
+		sourceColumn: province
+
+	partition sec_user_province = entity
+		mode: directLake
+		source
+			entityName: user_province
+			schemaName: sec
+			expressionSource: DatabaseQuery
