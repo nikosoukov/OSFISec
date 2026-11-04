@@ -6,7 +6,7 @@
 | | |
 |---|---|
 | Session | "Microsoft Fabric Governance and Security" for OSFI (Teams). Tue Nov 3 2026, 9:30–11:00 content, then 30 min Q&A |
-| Presenter | Nicolas Soukoff, Microsoft Solution Engineer |
+| Presenter |  |
 | Format | Presenter-run live demos. The audience doesn't need Fabric access. 8 demos of 2–4 min each, all on one data path. |
 | Self-contained | Builds everything from scratch in **any** tenant. No dependency on earlier sessions, workspaces, lakehouses or repos. |
 
