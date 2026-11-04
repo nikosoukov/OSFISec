@@ -1,7 +1,0 @@
-/// Direct Lake source: the wh_gold SQL connection string and warehouse id.
-/// 02-Deploy-FgdWorkspace.ps1 replaces __SQL_ENDPOINT__ and __WAREHOUSE_ID__ before upload.
-expression DatabaseQuery =
-		let
-		    database = Sql.Database("__SQL_ENDPOINT__", "__WAREHOUSE_ID__")
-		in
-		    database
